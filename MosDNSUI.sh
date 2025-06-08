@@ -2,7 +2,7 @@
 
 # MosDNS 全新独立监控面板 - 一键部署与回滚脚本
 # 作者：ChatGPT
-# 版本：3.5 (修正系统信息布局，确保始终在底部面板顶部横跨，同时移除JS中错误的DOM移动逻辑)
+# 版本：3.6 (修正系统信息布局，确保始终在底部面板顶部横跨，同时移除JS中错误的DOM移动逻辑)
 # 功能：部署一个独立的 Flask 应用，通过网页监控 MosDNS 状态。
 #      此面板与 MosDNS 自带 UI 并行运行，互不影响。
 #      提供回滚功能，移除本脚本部署的所有文件和配置。
@@ -687,7 +687,7 @@ EOF
             box-sizing: border-box;
         }
 
-        /* Footer Panel - Now a flex container with two main rows */
+        /* Footer Panel */
         .footer-panel {
             width: 100%;
             max-width: 1400px;
@@ -710,9 +710,9 @@ EOF
         }
 
         /* New container for the 3 control groups in a grid below system info */
-        .footer-controls-grid {
+        .footer-control-sections {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 3 columns for controls */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Auto-fit into up to 3 columns */
             gap: 2rem; /* Gap between control groups */
             width: 100%; /* Occupy full width of footer-panel */
         }
@@ -870,7 +870,7 @@ EOF
             body { padding: 1.5rem; }
             .header { margin-bottom: 1.5rem; }
             /* Footer grid layout for medium screens */
-            .footer-controls-grid { /* The controls below system info will stack */
+            .footer-control-sections { /* The 3 control groups will stack */
                 grid-template-columns: 1fr; 
                 gap: 1.5rem;
             }
@@ -958,7 +958,7 @@ EOF
             <div class="metrics-container" id="metrics-system"></div>
         </div>
 
-        <div class="footer-controls-grid"> <!-- New container for grid controls -->
+        <div class="footer-control-sections"> <!-- New container for grid controls -->
             <div class="card-toggle-container control-group">
                 <h3><i class="fas fa-eye"></i> 显示卡片</h3>
                 <div class="toggle-group" id="card-toggles">
