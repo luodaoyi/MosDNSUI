@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MosDNS 服务监控</title>
+    <title>MosDNS 监控面板</title>
 
     <!-- Favicon / 网站图标 -->
     <link rel="icon" type="image/png" href="/static/favicon.png">
@@ -193,10 +193,10 @@
         body {
             font-family: 'SF Pro Text', 'system-ui', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
-            padding: 2rem; /* Increased padding */
+            padding: 2rem;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6; /* Slightly increased line height */
+            line-height: 1.6;
             transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
             min-height: 100vh;
             display: flex;
@@ -214,96 +214,100 @@
         }
 
         .header h1 {
-            font-size: 2.5rem; /* Larger title */
+            font-size: 2.5rem;
             color: var(--accent-color);
-            margin: 0 0 0.8rem 0; /* More spacing */
+            margin: 0 0 0.8rem 0;
             font-weight: 700;
-            letter-spacing: -0.03em; /* Tighter letter spacing for title */
+            letter-spacing: -0.03em;
         }
         .header-gradient-bar {
             width: 100%;
-            max-width: 160px; /* Wider bar */
-            height: 5px; /* Thicker bar */
+            max-width: 160px;
+            height: 5px;
             border-radius: var(--radius-bar);
             background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
             margin: 0 auto 1.5rem auto;
             transition: background-image 0.4s ease-in-out;
         }
-
-        /* Theme Toggle Buttons (now in footer) */
-        .theme-selector {
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-            gap: 0.5rem; /* Gap between buttons */
-            /* Removed fixed positioning styles */
-            background-color: var(--control-bg); /* Use control background */
-            border: 1px solid var(--control-border); /* Use control border */
-            border-radius: var(--radius-control);
-            box-shadow: var(--toggle-shadow);
-            overflow: hidden;
-            padding: 0.5rem; /* Padding for the container */
-            justify-content: center; /* Center buttons within its container */
-        }
-        .theme-selector button {
-            background: none;
-            border: none;
-            padding: 0.6rem 0.9rem;
-            color: var(--control-text);
-            font-size: 0.9rem;
-            cursor: pointer;
-            outline: none;
-            transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease-out;
-            border-radius: var(--radius-control); /* Apply radius to individual buttons */
-            flex-grow: 1; /* Allow buttons to grow */
-            min-width: 90px; /* Ensure a minimum width for buttons */
-        }
-        .theme-selector button:hover {
-            background-color: var(--control-hover-bg);
-        }
-        .theme-selector button.active {
-            background-color: var(--control-active-bg);
-            color: var(--control-active-text);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        /* No border-right needed if buttons have gap and individual border-radius */
-        .theme-selector button i {
-            margin-right: 0.3em;
-        }
-
+        
+        /* ===== ULTIMATE LAYOUT FIX v3 ===== */
         .main-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* Auto-fit columns, slightly wider min */
-            gap: 1.5rem; /* Increased gap */
+            /* Create columns of a fixed width, preventing any stretching */
+            grid-template-columns: repeat(auto-fit, 420px);
+            gap: 1.5rem;
             width: 100%;
-            max-width: 1400px;
+            max-width: 1800px;
             flex-grow: 1;
-            margin-bottom: 2rem; /* Space before footer */
+            margin-bottom: 2rem;
+            /* Center the grid of cards */
+            justify-content: center;
         }
 
         .card {
             background-color: var(--card-bg);
             border-radius: var(--radius-main);
             box-shadow: var(--card-shadow);
-            padding: 1.8rem; /* More padding inside cards */
-            display: none; /* Initially hidden */
+            padding: 1.8rem;
+            display: none;
             flex-direction: column;
             box-sizing: border-box;
             transition: all 0.3s ease-in-out;
             border: 1px solid var(--border-color);
-            transform: translateY(0); /* Ensure smooth hover */
         }
         .card.visible {
             display: flex;
         }
         .card:hover {
-            transform: translateY(-0.35rem); /* Slightly more pronounced lift */
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12); /* Enhanced hover shadow */
+            transform: translateY(-0.35rem);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
         }
+
+        /* The key change: card content is now stacked vertically */
         .card-content {
             display: flex;
-            flex-direction: row;
-            gap: 2rem; /* Increased gap within card */
+            flex-direction: column; /* Stack metrics and charts vertically */
+            gap: 1.5rem;
             flex-grow: 1;
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 0.8rem 1rem;
+            align-items: center;
+        }
+        
+        .charts {
+            display: flex;
+            flex-direction: column; /* Default: stack charts vertically on mobile */
+            gap: 1.2rem;
+            align-items: center;
+            width: 100%;
+        }
+        /* ===== END OF ULTIMATE LAYOUT FIX v3 ===== */
+        
+        .metrics-container p {
+            margin: 0;
+            font-size: 1.05rem;
+            display: contents;
+        }
+        .metrics-container .fas {
+            color: var(--accent-color);
+            width: 1.2em;
+            text-align: center;
+            opacity: 0.85;
+        }
+        .label {
+            font-weight: 500;
+            color: var(--label-color);
+            text-align: left;
+            white-space: nowrap; 
+        }
+        .value {
+            color: var(--value-color);
+            font-weight: 600;
+            text-align: right;
         }
 
         h2, h3 {
@@ -311,13 +315,13 @@
             border-bottom: none;
             padding-bottom: 0;
             margin-top: 0;
-            margin-bottom: 0.6rem; /* More margin */
+            margin-bottom: 0.6rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 0.6rem; /* More gap for icon */
+            gap: 0.6rem;
         }
-        h2 { font-size: 1.6rem; } /* Slightly larger */
+        h2 { font-size: 1.6rem; }
         h3 { font-size: 1.3rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.6rem; margin-bottom: 1rem; }
 
         h2 .title-text {
@@ -325,7 +329,7 @@
             text-align: left;
         }
         h2 .status-dot {
-            width: 0.6rem; /* Slightly larger dot */
+            width: 0.6rem;
             height: 0.6rem;
             border-radius: 50%;
             transition: background-color 0.3s ease-in-out;
@@ -336,67 +340,35 @@
 
         .card-title-gradient-bar {
             width: 100%;
-            height: 4px; /* Thicker bar */
+            height: 4px;
             border-radius: var(--radius-bar);
             background-image: linear-gradient(to right, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
             margin-bottom: 1.2rem;
             transition: background-image 0.4s ease-in-out;
         }
 
-        .metrics-container {
-            flex: 1;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 0.6rem 1.2rem; /* More space */
-            align-items: baseline;
-        }
-        .metrics-container p {
-            margin: 0; /* Remove default paragraph margin */
-            font-size: 1.05rem; /* Slightly larger text */
-            display: contents;
-        }
-        .label {
-            font-weight: 500;
-            color: var(--label-color);
-            text-align: right;
-            padding-right: 0.6rem;
-        }
-        .value {
-            color: var(--value-color);
-            font-weight: 600;
-            text-align: left;
-        }
         .value.accent {
             color: var(--accent-color);
-            font-weight: 700; /* More emphasis */
+            font-weight: 700;
         }
-
-        .charts {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem; /* More gap between charts */
-            flex-shrink: 0;
-            align-items: center; /* Center charts */
-        }
+        
         .chart-container {
             position: relative;
-            width: 140px; /* Slightly larger charts */
+            width: 140px;
             height: 140px;
-            background-color: var(--card-bg); /* Ensure chart background matches card */
-            border-radius: var(--radius-main); /* Match card radius */
-            padding: 0.5rem; /* Padding for chart */
+            background-color: var(--card-bg);
+            border-radius: var(--radius-main);
+            padding: 0.5rem;
             box-sizing: border-box;
         }
 
-        /* Footer Panel */
         .footer-panel {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1800px;
             display: grid;
-            /* Now 4 potential columns */
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted min-width for 4 columns */
-            gap: 2rem; /* Increased gap */
-            margin-top: auto; /* Push to bottom */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: auto;
             padding: 1.8rem;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-main);
@@ -405,19 +377,54 @@
             align-items: flex-start;
         }
 
-        /* Common styling for control groups in footer */
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background-color: var(--control-bg);
+            border: 1px solid var(--control-border);
+            border-radius: var(--radius-control);
+            box-shadow: var(--toggle-shadow);
+            overflow: hidden;
+            padding: 0.5rem;
+            justify-content: center;
+        }
+        .theme-selector button {
+            background: none;
+            border: none;
+            padding: 0.6rem 0.9rem;
+            color: var(--control-text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease-out;
+            border-radius: var(--radius-control);
+            flex-grow: 1;
+            min-width: 90px;
+        }
+        .theme-selector button:hover {
+            background-color: var(--control-hover-bg);
+        }
+        .theme-selector button.active {
+            background-color: var(--control-active-bg);
+            color: var(--control-active-text);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .theme-selector button i {
+            margin-right: 0.3em;
+        }
+        
         .control-group {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             align-items: flex-start;
         }
-        /* Specific tweaks for inner elements */
         .toggle-group {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Better toggle layout */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 0.8rem;
-            width: 100%; /* Fill available space */
+            width: 100%;
         }
         .toggle-group label {
             display: flex;
@@ -425,7 +432,7 @@
             gap: 0.5rem;
             cursor: pointer;
             font-size: 0.95rem;
-            padding: 0.5rem 0.8rem; /* Padding for toggle label area */
+            padding: 0.5rem 0.8rem;
             background-color: var(--control-bg);
             border: 1px solid var(--control-border);
             border-radius: var(--radius-control);
@@ -437,7 +444,6 @@
             border-color: var(--accent-color);
         }
         .toggle-group input[type="checkbox"] {
-            /* Hide default checkbox */
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -456,7 +462,7 @@
             border-color: var(--accent-color);
         }
         .toggle-group input[type="checkbox"]:checked::after {
-            content: '\2713'; /* Checkmark unicode character */
+            content: '\2713';
             display: block;
             position: absolute;
             top: 50%;
@@ -468,21 +474,20 @@
 
         .action-buttons {
             display: flex;
-            gap: 1.2rem; /* More space between buttons */
+            gap: 1.2rem;
             align-items: center;
             flex-wrap: wrap;
             margin-top: 0.5rem;
-            width: 100%; /* Ensure it takes full width within its parent */
-            justify-content: flex-start; /* Default to start alignment */
+            width: 100%;
+            justify-content: flex-start;
         }
-        /* Specific alignment for the refresh control group */
         .refresh-control-group .action-buttons {
-            flex-direction: column; /* Stack buttons vertically */
+            flex-direction: column;
             gap: 0.8rem;
-            align-items: flex-start; /* Align stacked items to the left */
+            align-items: flex-start;
         }
         .action-buttons button {
-            padding: 0.7rem 1.4rem; /* Larger buttons */
+            padding: 0.7rem 1.4rem;
             border-radius: var(--radius-control);
             border: 1px solid var(--control-border);
             background-color: var(--control-bg);
@@ -491,19 +496,17 @@
             transition: all 0.2s ease-in-out;
             cursor: pointer;
             outline: none;
-            display: inline-flex; /* For icon + text alignment */
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem; /* Space between icon and text */
-            width: auto; /* Allow buttons to take natural width */
+            gap: 0.5rem;
+            width: auto;
         }
-        /* Make immediate refresh button span full width if needed */
         .refresh-control-group .action-buttons #refresh-now-btn {
-            width: 100%; /* Full width for refresh button */
-            justify-content: center; /* Center content within full width button */
+            width: 100%;
+            justify-content: center;
         }
-        /* And flush cache button too */
         .refresh-control-group .action-buttons #flush-cache-btn {
-             width: 100%; /* Full width for flush button */
+             width: 100%;
              justify-content: center;
         }
 
@@ -525,9 +528,9 @@
         span#last_updated {
             font-size: 0.9rem;
             color: var(--label-color);
-            margin-left: 0; /* Reset margin from previous auto-left */
-            text-align: left; /* Default to left align */
-            width: 100%; /* Take full width below buttons */
+            margin-left: 0;
+            text-align: left;
+            width: 100%;
         }
 
         .error {
@@ -540,7 +543,6 @@
             margin-top: 2rem;
         }
 
-        /* Loading Spinner */
         #loading-spinner {
             display: none;
             width: 40px;
@@ -563,35 +565,40 @@
         }
 
         /* Responsive */
-        @media (max-width: 1280px) {
-            .main-container {
-                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Slightly smaller min-width */
+        @media (min-width: 992px) {
+            /* On large screens, place charts side-by-side */
+            .charts {
+                flex-direction: row;
+                justify-content: space-evenly;
             }
         }
+
         @media (max-width: 992px) {
+            .main-container {
+                /* On tablets, use a slightly smaller fixed width */
+                grid-template-columns: repeat(auto-fit, 380px);
+            }
             body { padding: 1.5rem; }
             .header { margin-bottom: 1.5rem; }
-            /* Footer grid layout for medium screens */
             .footer-panel {
-                grid-template-columns: 1fr; /* Stack all columns on smaller screens */
+                grid-template-columns: 1fr;
                 gap: 1.5rem;
             }
             .card { padding: 1.5rem; }
             .footer-panel { padding: 1.5rem; }
             .action-buttons {
-                justify-content: center; /* Center buttons on smaller screens */
+                justify-content: center;
             }
-            /* Specific alignment for the refresh control group */
             .refresh-control-group .action-buttons {
-                align-items: center; /* Center stacked items for smaller screens */
+                align-items: center;
             }
             span#last_updated {
-                margin-left: 0; /* Reset margin on smaller screens */
+                margin-left: 0;
                 text-align: center;
                 width: 100%;
             }
-            .control-group { /* Target all control groups */
-                align-items: center; /* Center content */
+            .control-group {
+                align-items: center;
             }
             .toggle-group {
                 grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -600,34 +607,20 @@
         }
 
         @media (max-width: 768px) {
-            html { font-size: 15px; } /* Base font smaller */
+            html { font-size: 15px; }
             body { padding: 1rem; }
+            .main-container {
+                /* On mobile, let cards take full width */
+                grid-template-columns: 1fr;
+            }
             .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
             .header-gradient-bar { max-width: 120px; height: 4px; margin-bottom: 1rem; }
             .card, .footer-panel { padding: 1rem; border-radius: 0.8rem; }
             h2 { font-size: 1.4rem; margin-bottom: 0.3rem; }
             h3 { font-size: 1.2rem; padding-bottom: 0.4rem; margin-bottom: 0.7rem; }
-            .card-content { flex-direction: column; gap: 1rem; }
-            .metrics-container {
-                grid-template-columns: 1fr; /* Stack labels and values */
-                gap: 0.4rem;
-            }
-            .metrics-container p {
-                display: block;
-                line-height: 1.3;
-            }
-            .label, .value {
-                text-align: left;
-                display: inline;
-                padding-right: 0;
-            }
-            .label::after {
-                content: ': ';
-            }
             .charts {
-                flex-direction: row;
+                flex-direction: row; /* Keep charts side-by-side on smaller tablets */
                 justify-content: space-around;
-                flex-wrap: wrap; /* Allow charts to wrap */
             }
             .chart-container { width: 110px; height: 110px; padding: 0.3rem;}
         }
@@ -637,11 +630,15 @@
             .header h1 { font-size: 1.8rem; }
             .header-gradient-bar { max-width: 90px; height: 3px; }
             .card { padding: 0.8rem; }
-            .charts { gap: 0.8rem; }
-            .chart-container { width: 90px; height: 90px; }
-            .toggle-group { grid-template-columns: 1fr; } /* Stack toggles */
+            /* On small mobile, stack charts again */
+            .charts { 
+                flex-direction: column;
+                gap: 0.8rem; 
+            }
+            .chart-container { width: 120px; height: 120px; }
+            .toggle-group { grid-template-columns: 1fr; }
             .action-buttons button { padding: 0.6rem 1rem; font-size: 0.85rem; }
-            .theme-selector button { min-width: unset; } /* Allow buttons to shrink further */
+            .theme-selector button { min-width: unset; }
         }
     </style>
 </head>
@@ -658,7 +655,7 @@
     </div>
 
     <div class="footer-panel">
-        <div class="system-info-container control-group"> <!-- Added control-group for consistent styling -->
+        <div class="system-info-container control-group">
             <h3><i class="fas fa-server"></i> 系统信息</h3>
             <div class="metrics-container" id="metrics-system"></div>
         </div>
@@ -666,7 +663,7 @@
         <div class="card-toggle-container control-group">
             <h3><i class="fas fa-eye"></i> 显示卡片</h3>
             <div class="toggle-group" id="card-toggles">
-                <!-- Toggles will be generated by JS -->
+                <!-- Toggles will be populated by JS -->
             </div>
         </div>
         
@@ -677,9 +674,8 @@
             </div>
         </div>
 
-        <!-- Combined Refresh & Cache control group -->
         <div class="refresh-cache-control-group control-group">
-            <h3><i class="fas fa-tools"></i> 操作与刷新</h3> <!-- Combined title -->
+            <h3><i class="fas fa-tools"></i> 操作与刷新</h3>
             <div class="toggle-group">
                 <label>
                     <input type="checkbox" id="auto-refresh-toggle"> 启用自动刷新 (5s)
@@ -699,12 +695,10 @@
         const REFRESH_INTERVAL = 5000;
         let chartInstances = {};
         let autoRefreshTimer;
-        let isRefreshing = false; // Prevent multiple simultaneous fetches
+        let isRefreshing = false;
 
-        // --- 修复点：注册 Chart.js 插件 ---
         Chart.register(ChartDataLabels);
 
-        // Helper function to create HTML elements
         function createElement(tag, className, innerText = '') {
             const el = document.createElement(tag);
             if (className) el.className = className;
@@ -712,11 +706,10 @@
             return el;
         }
 
-        // Helper for number formatting
         function formatNumber(num) {
             if (typeof num !== 'number') {
                 num = parseFloat(num);
-                if (isNaN(num)) return num; // If it's truly not a number, return as is
+                if (isNaN(num)) return num;
             }
             if (num >= 1000000) {
                 return (num / 1000000).toFixed(1) + 'M';
@@ -727,7 +720,6 @@
             return num.toLocaleString();
         }
 
-        // --- Theme handling ---
         const themeMap = {
             'light': { name: '默认亮色', icon: 'fa-sun' },
             'dark': { name: '默认暗色', icon: 'fa-moon' },
@@ -736,8 +728,8 @@
             'sunset': { name: '日落余晖', icon: 'fa-cloud-sun-rain' },
             'monochrome': { name: '高级灰', icon: 'fa-grip-lines' }
         };
-        const body = document.body; // Reference to the body element
-        const themeSelector = document.getElementById('theme-selector'); // Now in the footer
+        const body = document.body;
+        const themeSelector = document.getElementById('theme-selector');
 
         function setTheme(mode) {
             body.className = '';
@@ -745,13 +737,12 @@
                 body.classList.add(`theme-${mode}`);
             }
             localStorage.setItem('theme', mode);
-            updateThemeButtons(mode); // Update active button state
-            // Force rebuild and chart update to pick up new theme colors
+            updateThemeButtons(mode);
             refreshData(true, true); 
         }
 
         function updateThemeButtons(activeMode) {
-            themeSelector.innerHTML = ''; // Clear existing buttons
+            themeSelector.innerHTML = '';
             for (const mode in themeMap) {
                 const themeData = themeMap[mode];
                 const button = createElement('button');
@@ -766,17 +757,15 @@
         }
 
         const savedTheme = localStorage.getItem('theme') || 'light';
-        updateThemeButtons(savedTheme); // Initialize buttons
+        updateThemeButtons(savedTheme);
         if (savedTheme !== 'light') {
             body.classList.add(`theme-${savedTheme}`);
         }
 
-
-        // --- Data Fetching and Parsing ---
         async function fetchData() {
-            if (isRefreshing) return null; // Prevent multiple fetches
+            if (isRefreshing) return null;
             isRefreshing = true;
-            document.body.classList.add('loading'); // Show loading spinner
+            document.body.classList.add('loading');
 
             try {
                 const response = await fetch(API_URL);
@@ -798,28 +787,22 @@
                 return null;
             } finally {
                 isRefreshing = false;
-                document.body.classList.remove('loading'); // Hide loading spinner
+                document.body.classList.remove('loading');
             }
         }
 
-        // --- UI Rendering ---
         function createCacheCard(tag, title) {
             const card = createElement('div', 'card');
             card.dataset.tag = tag;
-
             const h2 = createElement('h2');
             const titleText = createElement('span', 'title-text', title);
             const statusDot = createElement('span', 'status-dot');
             statusDot.id = `status-dot-${tag}`;
-            h2.append(createElement('i', 'fas fa-server'), titleText, statusDot); // Added icon
-
+            h2.append(createElement('i', 'fas fa-server'), titleText, statusDot);
             const gradientBar = createElement('div', 'card-title-gradient-bar');
-
             const cardContent = createElement('div', 'card-content');
-
             const metricsContainer = createElement('div', 'metrics-container');
             metricsContainer.id = `metrics-${tag}`;
-
             const chartsContainer = createElement('div', 'charts');
             const totalHitChartContainer = createElement('div', 'chart-container');
             const lazyHitChartContainer = createElement('div', 'chart-container');
@@ -830,7 +813,6 @@
             totalHitChartContainer.appendChild(totalHitCanvas);
             lazyHitChartContainer.appendChild(lazyHitCanvas);
             chartsContainer.append(totalHitChartContainer, lazyHitChartContainer);
-
             cardContent.append(metricsContainer, chartsContainer);
             card.append(h2, gradientBar, cardContent);
             return card;
@@ -839,16 +821,13 @@
         function createOrUpdatePieChart(id, title, hit, total) {
             const ctx = document.getElementById(id);
             if (!ctx) return;
-
             const miss = Math.max(0, total - hit);
             const computedStyle = getComputedStyle(body); 
-
             const hitColor = computedStyle.getPropertyValue('--chart-color-hit').trim();
             const missColor = computedStyle.getPropertyValue('--chart-color-miss').trim();
             const hitBorder = computedStyle.getPropertyValue('--chart-border-hit').trim();
             const missBorder = computedStyle.getPropertyValue('--chart-border-miss').trim();
             const textColor = computedStyle.getPropertyValue('--text-color').trim();
-
             const data = {
                 labels: ['命中', '未命中'],
                 datasets: [{
@@ -858,7 +837,6 @@
                     borderWidth: 1.5
                 }]
             };
-
             const options = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -878,16 +856,31 @@
                 },
                 cutout: '70%',
             };
-
             if (chartInstances[id]) {
                 chartInstances[id].data = data;
                 chartInstances[id].options.plugins.title.color = textColor;
                 chartInstances[id].options.plugins.datalabels.color = textColor;
-                chartInstances[id].update('none'); // Update without animation for smoother refresh
+                chartInstances[id].update('none');
             } else {
                 chartInstances[id] = new Chart(ctx, { type: 'doughnut', data, options, plugins: [ChartDataLabels] });
             }
         }
+        
+        const iconMap = {
+            '请求总数': 'fa-globe',
+            '缓存命中': 'fa-check-circle',
+            '过期缓存命中': 'fa-history',
+            '缓存命中率': 'fa-bullseye',
+            '过期缓存命中率': 'fa-bullseye',
+            '缓存条目数': 'fa-database',
+            '启动时间': 'fa-power-off',
+            'CPU 时间': 'fa-microchip',
+            '常驻内存 (RSS)': 'fa-memory',
+            '待用堆内存 (Idle)': 'fa-box-open',
+            'Go 版本': 'fa-code-branch',
+            '线程数': 'fa-sitemap',
+            '打开文件描述符': 'fa-folder-open',
+        };
 
         function updateMetrics(containerId, metricsData) {
             const container = document.getElementById(containerId);
@@ -895,24 +888,24 @@
             container.innerHTML = '';
             metricsData.forEach(metric => {
                 const p = createElement('p');
-                const labelSpan = createElement('span', 'label', metric.label);
-                const valueSpan = createElement('span', 'value', metric.value);
+                const iconClass = iconMap[metric.label] || 'fa-question-circle';
+                const icon = createElement('i', `fas ${iconClass}`);
+                const labelSpan = createElement('span', 'label', metric.label + ':');
+                const valueSpan = createElement('span', 'value');
 
                 if (metric.numericValue !== undefined) {
                     valueSpan.innerText = formatNumber(metric.numericValue);
-                } else if (metric.value.includes('%')) {
-                    valueSpan.innerText = metric.value;
                 } else {
                     valueSpan.innerText = metric.value;
                 }
 
                 if (metric.accent) valueSpan.classList.add('accent');
-                p.append(labelSpan, valueSpan);
+                
+                p.append(icon, labelSpan, valueSpan);
                 container.appendChild(p);
             });
         }
-
-        // --- Card Toggles Logic ---
+        
         const cacheOrder = ['cache_all', 'cache_cn', 'cache_google', 'cache_node'];
         const cacheTitles = {
             'cache_all': '全部缓存', 'cache_cn': '国内缓存', 'cache_google': '国外缓存', 'cache_node': '节点缓存'
@@ -941,19 +934,16 @@
                 visibleCards = visibleCards.filter(t => t !== tag);
             }
             localStorage.setItem('visibleMosdnsCards', JSON.stringify(visibleCards));
-            // Card visibility change requires full rebuild to show/hide elements cleanly
             refreshData(true, true); 
         }
 
-        // --- Auto-refresh toggle logic ---
         const autoRefreshToggle = document.getElementById('auto-refresh-toggle');
         let autoRefreshEnabled = false;
 
         function startAutoRefresh() {
-            if (autoRefreshTimer) clearInterval(autoRefreshTimer); // Clear existing timer first
+            if (autoRefreshTimer) clearInterval(autoRefreshTimer);
             autoRefreshTimer = setInterval(() => {
-                // For auto-refresh, we only update data and charts (if needed), no full rebuild
-                refreshData(false, true); // updateCharts set to true here to keep charts updated
+                refreshData(false, true);
             }, REFRESH_INTERVAL);
             console.log('Auto-refresh started.');
         }
@@ -976,45 +966,36 @@
             }
         });
 
-        // --- Main Execution ---
         async function refreshData(forceRebuild = false, updateCharts = false) {
             const data = await fetchData();
             if (!data) {
-                 // If data fetching failed, stop auto-refresh temporarily
                 stopAutoRefresh();
-                autoRefreshToggle.checked = false; // Uncheck toggle
+                autoRefreshToggle.checked = false;
                 autoRefreshEnabled = false;
                 localStorage.setItem('autoRefresh', false);
                 return;
             } else if (autoRefreshEnabled && !autoRefreshTimer) {
-                // If data fetching succeeded after failure, and auto-refresh is enabled, restart
                 startAutoRefresh();
             }
 
             const mainContent = document.getElementById('main-content');
 
             if (forceRebuild) {
-                // If rebuilding, clear all existing cards and destroy charts
                 mainContent.innerHTML = '';
                 Object.values(chartInstances).forEach(chart => chart.destroy());
                 chartInstances = {};
-
-                // Re-create cards for visible ones
                 cacheOrder.forEach(tag => {
-                    if (data.caches[tag] && visibleCards.includes(tag)) { // Only create if visible
+                    if (data.caches[tag] && visibleCards.includes(tag)) {
                         mainContent.appendChild(createCacheCard(tag, cacheTitles[tag]));
                     }
                 });
             }
             
-            // Always update metrics and charts for visible cards (if updateCharts is true)
             cacheOrder.forEach(tag => {
                 const card = mainContent.querySelector(`.card[data-tag="${tag}"]`);
                 if (card) {
-                    // Always set visibility class, regardless of forceRebuild
                     card.classList.toggle('visible', visibleCards.includes(tag));
-
-                    if(visibleCards.includes(tag)) { // Only update if card is visible
+                    if(visibleCards.includes(tag)) {
                         const cardData = data.caches[tag];
                         updateMetrics(`metrics-${tag}`, [
                             { label: '请求总数', numericValue: cardData.query_total },
@@ -1024,13 +1005,16 @@
                             { label: '过期缓存命中率', value: cardData.lazy_hit_rate, accent: true },
                             { label: '缓存条目数', numericValue: cardData.size_current },
                         ]);
-
                         const statusDot = document.getElementById(`status-dot-${tag}`);
                         if (statusDot) {
                             statusDot.classList.remove('status-green', 'status-yellow');
                             statusDot.classList.add(cardData.query_total > 0 ? 'status-green' : 'status-yellow');
                         }
-                        if(updateCharts) { // Only update/create charts if explicitly requested
+                        const chartsContainer = card.querySelector('.charts');
+                        if (chartsContainer) {
+                           chartsContainer.style.display = cardData.query_total > 0 ? 'flex' : 'none';
+                        }
+                        if(updateCharts && cardData.query_total > 0) {
                             createOrUpdatePieChart(`chart-hit-${tag}`, '命中', cardData.hit_total, cardData.query_total);
                             createOrUpdatePieChart(`chart-lazy-${tag}`, '过期命中', cardData.lazy_hit_total, cardData.query_total);
                         }
@@ -1052,7 +1036,6 @@
         }
 
         document.getElementById('refresh-now-btn').addEventListener('click', () => {
-            // Manual refresh button should update data and charts
             refreshData(false, true); 
         });
 
@@ -1062,7 +1045,6 @@
                     const response = await fetch(FLUSH_ENDPOINT, { method: 'POST' });
                     if (response.ok) {
                         alert("FakeIP 缓存已清空！页面将刷新。");
-                        // After flush, force a full rebuild and chart update
                         await refreshData(true, true);
                     } else {
                         const errorData = await response.json();
@@ -1075,22 +1057,18 @@
             }
         });
         
-        // Initial setup on page load
         setupCardToggles();
         
-        // Retrieve auto-refresh preference from localStorage
         const savedAutoRefresh = localStorage.getItem('autoRefresh');
-        if (savedAutoRefresh === null) { // First time user, default to true
+        if (savedAutoRefresh === null) {
             autoRefreshEnabled = true;
         } else {
             autoRefreshEnabled = savedAutoRefresh === 'true';
         }
         autoRefreshToggle.checked = autoRefreshEnabled;
 
-        // Initial data load: full rebuild and chart creation
         refreshData(true, true); 
 
-        // Start auto-refresh if enabled
         if (autoRefreshEnabled) {
             startAutoRefresh();
         } else {
