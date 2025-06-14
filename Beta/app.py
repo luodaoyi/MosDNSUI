@@ -25,9 +25,11 @@ MOSDNS_ADMIN_URL = os.environ.get('MOSDNS_ADMIN_URL', 'http://127.0.0.1:9099')
 
 # --- 辅助函数 ---
 def allowed_file(filename):
+    """检查文件后缀是否允许"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_current_background_filename():
+    """检查是否存在自定义背景文件，并返回其完整文件名"""
     for ext in ALLOWED_EXTENSIONS:
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"{CUSTOM_BG_FILENAME}.{ext}")
         if os.path.exists(filepath):
@@ -144,5 +146,5 @@ def remove_background():
     return jsonify({"success": True, "message": "没有自定义背景可删除"})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('FLASK_PORT', 5002)) # Beta 版默认 5002 端口
+    port = int(os.environ.get('FLASK_PORT', 5002))
     app.run(host='0.0.0.0', port=port, debug=False)
