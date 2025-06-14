@@ -24,8 +24,8 @@ BACKUP_DIR="$PROJECT_DIR/backups"
 UPLOAD_DIR="$PROJECT_DIR/uploads"
 FLASK_PORT=5002
 SYSTEMD_SERVICE_FILE="/etc/systemd/system/$FLASK_APP_NAME.service"
-APP_PY_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/main/Beta/app.py"
-INDEX_HTML_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/main/Beta/index.html"
+APP_PY_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/refs/heads/main/Beta/app.py"
+INDEX_HTML_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/refs/heads/main/Beta/index.html"
 APP_PY_PATH="$PROJECT_DIR/app.py"
 INDEX_HTML_PATH="$PROJECT_DIR/templates/index.html"
 
