@@ -22,7 +22,7 @@
             --danger-text-color: #e74c3c; --danger-hover-bg-color: #e74c3c; --danger-hover-text-color: #ffffff;
         }
         html { font-size: 16px; scroll-behavior: smooth; }
-        body { font-family: 'SF Pro Text', 'system-ui', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; margin: 0; padding: 2rem; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background-color 0.4s ease, color 0.4s ease, background-image 0.5s ease-in-out; min-height: 100vh; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; margin: 0; padding: 2rem; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; transition: background-color 0.4s ease, color 0.4s ease, background-image 0.5s ease-in-out; min-height: 100vh; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
         body.custom-background { background-size: cover; background-position: center; background-attachment: fixed; }
         .header { text-align: center; width: 100%; max-width: 1200px; margin-bottom: 2rem; }
         .header h1 { font-size: 2.2rem; color: var(--text-color); margin: 0 0 0.5rem 0; font-weight: 700; letter-spacing: -0.03em; }
@@ -121,7 +121,7 @@
             </section>
             <section class="control-section">
                 <h4 class="section-title"><i class="fas fa-eye"></i> 数据查看</h4>
-                <div class="data-view-group"><button id="show-rules-btn1">fakeip 域名</button><button id="show-rules-btn2">realip 域名</button><button id="show-rules-btn3">无 V4 域名</button><button id="show-rules-btn4">无 V6 域名</button><button id="show-cache-btn1">总缓存</button><button id="show-cache-btn2">CN 缓存</button><button id="show-cache-btn3">!CN 缓存</button><button id="show-cache-btn4">节点缓存</button></div>
+                <div class="data-view-group" id="data-view-buttons"></div>
             </section>
         </div>
         <div class="right-column">
@@ -151,80 +151,105 @@
         </div>
     </footer>
     <script>
-        const API_URL = '/api/mosdns_status';
-        const REFRESH_INTERVAL = 5000;
+        // === START OF FULLY CORRECTED AND OPTIMIZED JAVASCRIPT ===
+        const API_URL = '/api/mosdns_status'; const REFRESH_INTERVAL = 5000;
         let chartInstances = {}; let autoRefreshTimer = null; let currentTheme = 'light';
-        Chart.register(ChartDataLabels);
-        Chart.defaults.plugins.legend.display = false;
-        Chart.defaults.plugins.datalabels.font.weight = 'bold';
-        Chart.defaults.plugins.datalabels.font.size = 11;
-        Chart.defaults.cutout = '70%'; Chart.defaults.responsive = true; Chart.defaults.maintainAspectRatio = false;
+        Chart.register(ChartDataLabels); Chart.defaults.plugins.legend.display = false; Chart.defaults.plugins.datalabels.font.weight = 'bold'; Chart.defaults.plugins.datalabels.font.size = 11; Chart.defaults.cutout = '70%'; Chart.defaults.responsive = true; Chart.defaults.maintainAspectRatio = false;
         Chart.defaults.plugins.datalabels.formatter = (v, c) => { const s = c.chart.data.datasets[0].data.reduce((a, b) => a + b, 0); return s > 0 && v / s > 0.05 ? `${(v / s * 100).toFixed(0)}%` : ''; };
-        function createElement(tag, className, innerText = '', id = '') { const el = document.createElement(tag); if (className) el.className = className; if (innerText) el.innerText = innerText; if (id) el.id = id; return el; }
+        
+        const D = document;
+        const getById = (id) => D.getElementById(id);
+        
+        function createElement(tag, className, innerText = '', id = '') { const el = D.createElement(tag); if (className) el.className = className; if (innerText) el.innerText = innerText; if (id) el.id = id; return el; }
         function formatNumber(num) { if (typeof num !== 'number' && isNaN(num = parseFloat(num))) { return num; } return num.toLocaleString('en-US'); }
+        
         const iconMap = { '请求总数': 'fa-globe', '缓存命中': 'fa-check-circle', '过期缓存命中': 'fa-history', '缓存命中率': 'fa-bullseye', '过期缓存命中率': 'fa-bullseye', '缓存条目数': 'fa-database', '启动时间': 'fa-power-off', 'CPU 时间': 'fa-microchip', '常驻内存 (RSS)': 'fa-memory', '待用堆内存 (Idle)': 'fa-box-open', 'Go 版本': 'fa-code-branch', '线程数': 'fa-sitemap', '打开文件描述符': 'fa-folder-open', };
-        const cacheOrder = ['cache_all', 'cache_cn', 'cache_google', 'cache_node'];
-        const cacheTitles = { 'cache_all': '全部缓存', 'cache_cn': '国内缓存', 'cache_google': '国外缓存', 'cache_node': '节点缓存' };
+        const cacheOrder = ['cache_all', 'cache_cn', 'cache_google', 'cache_node']; const cacheTitles = { 'cache_all': '全部缓存', 'cache_cn': '国内缓存', 'cache_google': '国外缓存', 'cache_node': '节点缓存' };
+        
         const themeMap = {
             'light': { name: '默认亮色', icon: 'fa-sun', cssVars: { '--bg-color': '#f7f9fd', '--text-color': '#2c3e50', '--card-bg': '#ffffff', '--card-shadow': '0 6px 18px rgba(0, 0, 0, 0.08)', '--border-color': '#e0e6ec', '--accent-color': '#4a90e2', '--label-color': '#7f8c8d', '--value-color': '#34495e', '--control-bg': '#f0f4f7', '--control-border': '#d5dce2', '--control-text': '#5e727e', '--control-hover-bg': '#e5edf3', '--control-active-bg': '#4a90e2', '--control-active-text': '#ffffff', '--gradient-start': '#4a90e2', '--gradient-mid': '#2e86de', '--gradient-end': '#4a90e2' }, chartColors: { hit: 'rgba(74, 144, 226, 0.7)', miss: 'rgba(189, 195, 199, 0.3)', hitBorder: '#4a90e2', missBorder: '#bdc3c7', text: '#2c3e50' } },
-            'dark': { name: '默认暗色', icon: 'fa-moon', cssVars: { '--bg-color': '#1a1a1a', '--text-color': '#e0e0e0', '--card-bg': '#282828', '--card-shadow': '0 8px 25px rgba(0, 0, 0, 0.5)', '--border-color': '#3a3a3a', '--accent-color': '#5096ff', '--label-color': '#bbbbbb', '--value-color': '#ffffff', '--control-bg': '#353535', '--control-border': '#4a4a4a', '--control-text': '#e0e0e0', '--control-hover-bg': '#404040', '--control-active-bg': '#5096ff', '--control-active-text': '#ffffff', '--gradient-start': '#5096ff', '--gradient-mid': '#3a7ce0', '--gradient-end': '#5096ff' }, chartColors: { hit: 'rgba(80, 150, 255, 0.7)', miss: 'rgba(100, 100, 100, 0.3)', hitBorder: '#5096ff', missBorder: '#707070', text: '#e0e0e0' } },
-            'glass': { name: '透明琉璃', icon: 'fa-gem', cssVars: { '--bg-color': 'transparent', '--text-color': '#ffffff', '--card-bg': 'rgba(20, 20, 40, 0.25)', '--card-shadow': '0 8px 32px 0 rgba(0, 0, 0, 0.37)', '--border-color': 'rgba(255, 255, 255, 0.18)', '--accent-color': '#82aaff', '--label-color': '#e0e0e0', '--value-color': '#ffffff', '--control-bg': 'rgba(255, 255, 255, 0.1)', '--control-border': 'rgba(255, 255, 255, 0.25)', '--control-text': '#f0f0f0', '--control-hover-bg': 'rgba(255, 255, 255, 0.2)', '--control-active-text': '#000000', '--gradient-start': '#82aaff', '--gradient-mid': '#c792ea', '--gradient-end': '#82aaff' }, chartColors: { hit: 'rgba(130, 170, 255, 0.7)', miss: 'rgba(255, 255, 255, 0.15)', hitBorder: '#82aaff', missBorder: '#cccccc', text: '#ffffff' }, extraStyles: { '.card, .control-section': 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);' } }
+            'dark': { name: '默认暗色', icon: 'fa-moon', cssVars: { '--bg-color': '#1a1a1a', '--text-color': '#e0e0e0', '--card-bg': '#282828', '--card-shadow': '0 8px 25px rgba(0, 0, 0, 0.5)', '--border-color': '#3a3a3a', '--accent-color': '#5096ff', '--label-color': '#bbbbbb', '--value-color': '#ffffff', '--control-bg': '#353535', '--control-border': '#4a4a4a', '--control-text': '#e0e0e0', '--control-hover-bg': '#404040', '--control-active-bg': '#5096ff', '--control-active-text': '#ffffff', '--gradient-start': '#5096ff', '--gradient-mid': '#3a7ce0', '--gradient-end': '#5096ff' }, chartColors: { hit: 'rgba(80, 150, 255, 0.7)', miss: 'rgba(100, 100, 100, 0.3)', hitBorder: '#5096ff', missBorder: '#707070', text: '#e0e0e0' }, extraStyles: { 'h1, h2, h4, .section-title, .metric-label, .metric-value, .switch-label-text, .tab-button, footer, .control-base-label, .data-view-group button': 'text-shadow: 0 1px 3px rgba(0,0,0,0.5);', '.fas, .fa-solid, .fa-brands': 'filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));' } },
+            'glass': { name: '高光琉璃', icon: 'fa-gem', cssVars: { '--bg-color': 'transparent', '--text-color': '#ffffff', '--card-bg': 'rgba(255, 255, 255, 0.1)', '--card-shadow': '0 8px 32px 0 rgba(0, 0, 0, 0.37)', '--border-color': 'rgba(255, 255, 255, 0.2)', '--accent-color': '#90b8ff', '--label-color': '#d0d0d0', '--value-color': '#ffffff', '--control-bg': 'rgba(255, 255, 255, 0.15)', '--control-border': 'rgba(255, 255, 255, 0.2)', '--control-text': '#f0f0f0', '--control-hover-bg': 'rgba(255, 255, 255, 0.25)', '--control-active-bg': '#90b8ff', '--control-active-text': '#1a1a1a', '--gradient-start': '#82aaff', '--gradient-mid': '#c792ea', '--gradient-end': '#82aaff' }, chartColors: { hit: 'rgba(130, 170, 255, 0.7)', miss: 'rgba(255, 255, 255, 0.15)', hitBorder: '#82aaff', missBorder: '#cccccc', text: '#ffffff' }, extraStyles: { '.card, .control-section': 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%); box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.1), var(--card-shadow); border: none;', 'h1, h2, h4, .section-title, .metric-label, .metric-value, .switch-label-text, .tab-button, footer, .control-base-label, .data-view-group button': 'text-shadow: 0 1px 4px rgba(0,0,0,0.6);', '.fas, .fa-solid, .fa-brands': 'filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));' } }
         };
+        
         let visibleCards = JSON.parse(localStorage.getItem('visibleMosdnsCards')) || cacheOrder;
-        function updateThemeButtons(activeMode) { const ts = document.getElementById('theme-selector'); ts.innerHTML = ''; ['light', 'dark', 'glass'].forEach(mode => { if (!themeMap[mode]) return; const t = themeMap[mode]; const btn = createElement('button', 'control-base-label'); btn.dataset.theme = mode; btn.innerHTML = `<i class="fas ${t.icon}"></i> ${t.name}`; if (mode === activeMode) btn.classList.add('active'); btn.onclick = () => setTheme(mode); ts.appendChild(btn); }); }
+        
         function setTheme(mode) {
-            currentTheme = mode; const theme = themeMap[mode];
-            Object.entries(theme.cssVars).forEach(([key, value]) => document.documentElement.style.setProperty(key, value));
-            const oldExtraStyle = document.getElementById('theme-extra-styles'); if (oldExtraStyle) oldExtraStyle.remove();
-            if (theme.extraStyles) { const style = createElement('style', '', '', 'theme-extra-styles'); style.textContent = Object.entries(theme.extraStyles).map(([sel, rule]) => `${sel} { ${rule} }`).join('\n'); document.head.appendChild(style); }
+            currentTheme = mode; const theme = themeMap[mode] || themeMap.light;
+            Object.entries(theme.cssVars).forEach(([key, value]) => D.documentElement.style.setProperty(key, value));
+            getById('theme-extra-styles')?.remove();
+            if (theme.extraStyles) { const style = createElement('style', '', '', 'theme-extra-styles'); style.textContent = Object.entries(theme.extraStyles).map(([sel, rule]) => `${sel} { ${rule} }`).join('\n'); D.head.appendChild(style); }
             localStorage.setItem('theme', mode); updateThemeButtons(mode);
             setTimeout(() => { Object.values(chartInstances).forEach(c => c.destroy()); chartInstances = {}; refreshData(true, true); }, 50);
         }
-        function setBackgroundImage(url) { const body = document.body; if (url) { body.style.backgroundImage = `url(${url})`; body.classList.add('custom-background'); } else { body.style.backgroundImage = ''; body.classList.remove('custom-background'); } }
-        async function handleImageUpload(file) { const fd = new FormData(); fd.append('background_image', file); try { const res = await fetch('/api/upload_background', { method: 'POST', body: fd }); const r = await res.json(); if (r.success) { setBackgroundImage(r.url + '?t=' + new Date().getTime()); alert('✅ 背景图片上传成功！'); } else { throw new Error(r.error || '上传失败'); } } catch (e) { alert(`❌ 上传失败: ${e.message}`); } }
+        
+        function setBackgroundImage(url) { D.body.style.backgroundImage = url ? `url(${url})` : ''; D.body.classList.toggle('custom-background', !!url); }
+        async function handleImageUpload(file) { const fd = new FormData(); fd.append('background_image', file); try { const res = await fetch('/api/upload_background', { method: 'POST', body: fd }); const r = await res.json(); if (r.success) { setBackgroundImage(r.url + '?t=' + Date.now()); alert('✅ 背景图片上传成功！'); } else { throw new Error(r.error || '上传失败'); } } catch (e) { alert(`❌ 上传失败: ${e.message}`); } }
         async function handleRemoveBackground() { if (!confirm('确定要移除自定义背景吗？')) return; try { const res = await fetch('/api/remove_background', { method: 'POST' }); const r = await res.json(); if (r.success) { setBackgroundImage(null); alert('✅ 自定义背景已移除。'); } else { throw new Error(r.error || '移除失败'); } } catch(e) { alert(`❌ 移除失败: ${e.message}`); } }
-        async function fetchAPI(url) { try { const r = await fetch(url); if (!r.ok) throw new Error(`网络响应错误: ${r.statusText} (${r.status})`); return await r.json(); } catch (e) { console.error(`Fetch error from ${url}:`, e); return null; } }
-        function createCacheCard(tag, title) { const c = createElement('div', 'card'); c.dataset.tag = tag; c.innerHTML = `<h2><i class="fas fa-server"></i><span class="title-text">${title}</span><span class="status-dot" id="status-dot-${tag}"></span></h2><div class="card-title-gradient-bar"></div><div class="metrics-container" id="metrics-${tag}"></div><div class="charts"><div class="chart-container"><canvas id="chart-hit-${tag}"></canvas></div><div class="chart-container"><canvas id="chart-lazy-${tag}"></canvas></div></div>`; return c; }
-        function createOrUpdatePieChart(id, title, hit, total) { const ctx = document.getElementById(id); if (!ctx) return; const c = themeMap[currentTheme].chartColors; const d = { labels: ['命中', '未命中'], datasets: [{ data: [hit, Math.max(0, total - hit)], backgroundColor: [c.hit, c.miss], borderColor: [c.hitBorder, c.missBorder], borderWidth: 1.5 }] }; const o = { plugins: { title: { display: true, text: title, color: c.text, font: { size: 12, weight: 'bold' } }, datalabels: { color: c.text } } }; if (chartInstances[id]) { chartInstances[id].data = d; chartInstances[id].options = o; chartInstances[id].update('none'); } else { chartInstances[id] = new Chart(ctx, { type: 'doughnut', data: d, options: o }); } }
-        function updateMetrics(id, data) { const c = document.getElementById(id); if (!c) return; c.innerHTML = ''; data.forEach(m => { const p = createElement('div', 'metric-label'); p.innerHTML = `<i class="fas ${iconMap[m.label] || 'fa-question-circle'}"></i> <span>${m.label}:</span>`; const v = createElement('div', `metric-value${m.accent ? ' accent' : ''}`); v.innerText = (m.numericValue !== undefined) ? formatNumber(m.numericValue) : m.value; c.append(p, v); }); }
-        function setupCardToggles() { const c = document.getElementById('card-toggles'); c.innerHTML = ''; cacheOrder.forEach(t => { const l = createElement('label', 'control-base-label'); const i = createElement('input'); i.type = 'checkbox'; i.dataset.tag = t; i.checked = visibleCards.includes(t); i.onchange = (e) => { const tag = e.target.dataset.tag; if (e.target.checked) { if (!visibleCards.includes(tag)) visibleCards.push(tag); } else { visibleCards = visibleCards.filter(t => t !== tag); } localStorage.setItem('visibleMosdnsCards', JSON.stringify(visibleCards)); refreshData(true); }; l.append(i, createElement('span', 'toggle-label-text', cacheTitles[t])); c.appendChild(l); }); }
-        function startAutoRefresh() { if (autoRefreshTimer) return; autoRefreshTimer = setInterval(() => refreshData(false, true), REFRESH_INTERVAL); }
-        function stopAutoRefresh() { if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; } }
+        async function fetchAPI(url) { try { const r = await fetch(url); if (!r.ok) throw new Error(`网络响应错误: ${r.statusText} (${r.status})`); return await r.json(); } catch (e) { console.error(`Fetch error from ${url}:`, e); return { error: e.message }; } }
+        
+        function createCacheCard(tag, title) { const c = createElement('div', 'card'); c.dataset.tag = tag; c.innerHTML = `<h2><i class="fas fa-server"></i><span class="title-text">${title}</span><span class="status-dot" id="status-dot-${tag}"></span></h2><div class="card-title-gradient-bar"></div><div class="metrics-container" id="metrics-${tag}"></div><div class="charts" id="charts-${tag}"><div class="chart-container"><canvas id="chart-hit-${tag}"></canvas></div><div class="chart-container"><canvas id="chart-lazy-${tag}"></canvas></div></div>`; return c; }
+        function createOrUpdatePieChart(id, title, hit, total) { const ctx = getById(id); if (!ctx) return; const colors = themeMap[currentTheme]?.chartColors || themeMap.light.chartColors; const data = { labels: ['命中', '未命中'], datasets: [{ data: [hit, Math.max(0, total - hit)], backgroundColor: [colors.hit, colors.miss], borderColor: [colors.hitBorder, colors.missBorder], borderWidth: 1.5 }] }; const options = { plugins: { title: { display: true, text: title, color: colors.text, font: { size: 12, weight: 'bold' } }, datalabels: { color: colors.text } } }; if (chartInstances[id]) { chartInstances[id].data = data; chartInstances[id].options = options; chartInstances[id].update('none'); } else { chartInstances[id] = new Chart(ctx, { type: 'doughnut', data, options }); } }
+        function updateMetrics(containerId, metricsData) { const c = getById(containerId); if (!c) return; c.innerHTML = ''; metricsData.forEach(m => { const p = createElement('div', 'metric-label'); p.innerHTML = `<i class="fas ${iconMap[m.label] || 'fa-question-circle'}"></i> <span>${m.label}:</span>`; const v = createElement('div', `metric-value${m.accent ? ' accent' : ''}`); v.innerText = (m.numericValue !== undefined) ? formatNumber(m.numericValue) : m.value; c.append(p, v); }); }
+        
         async function refreshData(forceRebuild = false, updateCharts = false) {
-            document.body.classList.add('loading');
-            const data = await fetchAPI(API_URL);
-            document.body.classList.remove('loading');
-            if (!data) { stopAutoRefresh(); const t = document.getElementById('auto-refresh-toggle'); if (t) t.checked = false; localStorage.setItem('autoRefresh', 'false'); document.getElementById('main-content').innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>无法连接到 MosDNS API。</p><small>${data?.error || '请检查后端服务是否运行。'}</small></div>`; return; }
-            if (forceRebuild) { document.getElementById('main-content').innerHTML = ''; Object.values(chartInstances).forEach(c => c.destroy()); chartInstances = {}; cacheOrder.forEach(tag => { if (data.caches[tag] && visibleCards.includes(tag)) document.getElementById('main-content').appendChild(createCacheCard(tag, cacheTitles[tag])); }); }
-            cacheOrder.forEach(tag => { const card = document.querySelector(`.card[data-tag="${tag}"]`); if (card) { card.classList.toggle('visible', visibleCards.includes(tag)); if (card.classList.contains('visible') && data.caches[tag]) { const d = data.caches[tag]; updateMetrics(`metrics-${tag}`, [{ label: '请求总数', numericValue: d.query_total }, { label: '缓存命中', numericValue: d.hit_total }, { label: '过期缓存命中', numericValue: d.lazy_hit_total }, { label: '缓存命中率', value: d.hit_rate, accent: true }, { label: '过期缓存命中率', value: d.lazy_hit_rate, accent: true }, { label: '缓存条目数', numericValue: d.size_current }, ]); card.querySelector(`#status-dot-${tag}`).className = 'status-dot ' + (d.query_total > 0 ? 'status-green' : 'status-yellow'); card.querySelector('.charts').style.display = d.query_total > 0 ? 'flex' : 'none'; if ((forceRebuild || updateCharts) && d.query_total > 0) { createOrUpdatePieChart(`chart-hit-${tag}`, '命中', d.hit_total, d.query_total); createOrUpdatePieChart(`chart-lazy-${tag}`, '过期命中', d.lazy_hit_total, d.query_total); } } } });
-            updateMetrics('metrics-system', [{ label: '启动时间', value: data.system?.start_time || 'N/A' }, { label: 'CPU 时间', value: data.system?.cpu_time || 'N/A' }, { label: '常驻内存 (RSS)', value: data.system?.resident_memory || 'N/A' }, { label: '待用堆内存 (Idle)', value: data.system?.heap_idle_memory || 'N/A' }, { label: 'Go 版本', value: data.system?.go_version || 'N/A', accent: true }, { label: '线程数', numericValue: data.system?.threads || 'N/A' }, { label: '打开文件描述符', numericValue: data.system?.open_fds || 'N/A' }, ]);
-            document.getElementById('last_updated').innerHTML = `<i class="fas fa-clock"></i> 最后更新: ${new Date().toLocaleTimeString()}`;
+            D.body.classList.add('loading'); const data = await fetchAPI(API_URL); D.body.classList.remove('loading');
+            if (data.error) {
+                getById('main-content').innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>无法连接到 MosDNS API。</p><small>${data.error}</small></div>`;
+                const toggle = getById('auto-refresh-toggle'); if (toggle) { toggle.checked = false; localStorage.setItem('autoRefresh', 'false'); }
+                if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+                return;
+            }
+            if (forceRebuild) { getById('main-content').innerHTML = ''; Object.values(chartInstances).forEach(c => c.destroy()); chartInstances = {}; }
+
+            cacheOrder.forEach(tag => {
+                let card = D.querySelector(`.card[data-tag="${tag}"]`);
+                const shouldBeVisible = visibleCards.includes(tag);
+                const cardData = data.caches[tag];
+
+                if (shouldBeVisible && !card) { card = createCacheCard(tag, cacheTitles[tag]); getById('main-content').appendChild(card); } 
+                else if (!shouldBeVisible && card) { card.remove(); return; }
+                
+                if (card && cardData) {
+                    card.classList.add('visible');
+                    updateMetrics(`metrics-${tag}`, [{ label: '请求总数', numericValue: cardData.query_total }, { label: '缓存命中', numericValue: cardData.hit_total }, { label: '过期缓存命中', numericValue: cardData.lazy_hit_total }, { label: '缓存命中率', value: cardData.hit_rate, accent: true }, { label: '过期缓存命中率', value: cardData.lazy_hit_rate, accent: true }, { label: '缓存条目数', numericValue: cardData.size_current }]);
+                    getById(`status-dot-${tag}`).className = 'status-dot ' + (cardData.query_total > 0 ? 'status-green' : 'status-yellow');
+                    getById(`charts-${tag}`).style.display = cardData.query_total > 0 ? 'flex' : 'none';
+                    if ((forceRebuild || updateCharts) && cardData.query_total > 0) { createOrUpdatePieChart(`chart-hit-${tag}`, '命中', cardData.hit_total, cardData.query_total); createOrUpdatePieChart(`chart-lazy-${tag}`, '过期命中', cardData.lazy_hit_total, cardData.query_total); }
+                }
+            });
+
+            updateMetrics('metrics-system', [ { label: '启动时间', value: data.system?.start_time }, { label: 'CPU 时间', value: data.system?.cpu_time }, { label: '常驻内存 (RSS)', value: data.system?.resident_memory }, { label: '待用堆内存 (Idle)', value: data.system?.heap_idle_memory }, { label: 'Go 版本', value: data.system?.go_version, accent: true }, { label: '线程数', numericValue: data.system?.threads }, { label: '打开文件描述符', numericValue: data.system?.open_fds }, ]);
+            getById('last_updated').innerHTML = `<i class="fas fa-clock"></i> 最后更新: ${new Date().toLocaleTimeString()}`;
         }
+        
+        function setupCardToggles() { const c = getById('card-toggles'); c.innerHTML = ''; cacheOrder.forEach(t => { const l = createElement('label', 'control-base-label'); const i = createElement('input'); i.type = 'checkbox'; i.dataset.tag = t; i.checked = visibleCards.includes(t); i.onchange = (e) => { const tag = e.target.dataset.tag; if (e.target.checked) { if (!visibleCards.includes(tag)) visibleCards.push(tag); } else { visibleCards = visibleCards.filter(t => t !== tag); } localStorage.setItem('visibleMosdnsCards', JSON.stringify(visibleCards)); refreshData(true, true); }; l.append(i, createElement('span', 'toggle-label-text', cacheTitles[t])); c.appendChild(l); }); }
+        function updateThemeButtons(activeMode) { const ts = getById('theme-selector'); ts.innerHTML = ''; ['light', 'dark', 'glass'].forEach(mode => { if (!themeMap[mode]) return; const t = themeMap[mode]; const btn = createElement('button', 'control-base-label'); btn.dataset.theme = mode; btn.innerHTML = `<i class="fas ${t.icon}"></i> ${t.name}`; if (mode === activeMode) btn.classList.add('active'); btn.onclick = () => setTheme(mode); ts.appendChild(btn); }); }
+        
         function setupEventListeners() {
-            document.getElementById('refresh-now-btn').addEventListener('click', () => refreshData(false, true));
-            document.getElementById('auto-refresh-toggle').addEventListener('change', (e) => { localStorage.setItem('autoRefresh', e.target.checked); e.target.checked ? startAutoRefresh() : stopAutoRefresh(); });
-            const multiAction = (btnId, paths, msg) => { document.getElementById(btnId).addEventListener('click', () => { if (confirm(msg)) Promise.all(paths.map(p => fetch(`/plugins/${p}`))).then(() => alert('✅ 操作完成')); }); };
+            getById('refresh-now-btn').onclick = () => refreshData(false, true);
+            getById('auto-refresh-toggle').onchange = (e) => { const isEnabled = e.target.checked; localStorage.setItem('autoRefresh', isEnabled); if (isEnabled) { if (!autoRefreshTimer) autoRefreshTimer = setInterval(() => refreshData(false, true), REFRESH_INTERVAL); } else if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; } };
+            const multiAction = (btnId, paths, msg) => { getById(btnId).addEventListener('click', () => { if (confirm(msg)) Promise.all(paths.map(p => fetch(`/plugins/${p}`))).then(() => alert('✅ 操作完成')); }); };
             multiAction('save-rules-btn', ['my_fakeiplist/save', 'my_nodenov4list/save', 'my_nodenov6list/save', 'my_notinlist/save', 'my_nov4list/save', 'my_nov6list/save', 'my_realiplist/save'], '确定保存所有分流规则吗?');
             multiAction('flush-rules-btn', ['my_fakeiplist/flush', 'my_nodenov4list/flush', 'my_nodenov6list/flush', 'my_notinlist/flush', 'my_nov4list/flush', 'my_nov6list/flush', 'my_realiplist/flush'], '确定清空所有分流规则吗?');
-            document.getElementById('restart-mosdns-btn').onclick = () => { if (confirm('确定重启mosdns吗?')) fetch('/plugins/my_fakeiplist/restartall').then(() => setTimeout(() => location.reload(), 1000)); };
-            const showEndpoints = { 'show-rules-btn1': 'my_fakeiplist', 'show-rules-btn2': 'my_realiplist', 'show-rules-btn3': 'my_nov4list', 'show-rules-btn4': 'my_nov6list', 'show-cache-btn1': 'cache_all', 'show-cache-btn2': 'cache_cn', 'show-cache-btn3': 'cache_google', 'show-cache-btn4': 'cache_node' };
-            Object.keys(showEndpoints).forEach(id => { document.getElementById(id).onclick = () => window.open(`/plugins/${showEndpoints[id]}/show`, '_blank'); });
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
+            getById('restart-mosdns-btn').onclick = () => { if (confirm('确定重启mosdns吗?')) fetch('/plugins/my_fakeiplist/restartall').then(() => setTimeout(() => location.reload(), 1000)); };
+            const showEndpoints = { 'fakeip 域名': 'my_fakeiplist', 'realip 域名': 'my_realiplist', '无 V4 域名': 'my_nov4list', '无 V6 域名': 'my_nov6list', '总缓存': 'cache_all', 'CN 缓存': 'cache_cn', '!CN 缓存': 'cache_google', '节点缓存': 'cache_node' };
+            const dvContainer = getById('data-view-buttons'); Object.entries(showEndpoints).forEach(([name, path]) => { const btn = createElement('button'); btn.className = 'btn'; btn.textContent = name; btn.onclick = () => window.open(`/plugins/${path}/show`, '_blank'); dvContainer.appendChild(btn); });
+            const tabButtons = D.querySelectorAll('.tab-button'); const tabContents = D.querySelectorAll('.tab-content');
             tabButtons.forEach(button => { button.addEventListener('click', () => { tabButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); tabContents.forEach(content => content.classList.toggle('active', content.id === `tab-${button.dataset.tab}`)); }); });
-            document.getElementById('upload-bg-btn').onclick = () => document.getElementById('bg-upload-input').click();
-            document.getElementById('remove-bg-btn').onclick = handleRemoveBackground;
-            document.getElementById('bg-upload-input').onchange = (e) => { if (e.target.files[0]) handleImageUpload(e.target.files[0]); e.target.value = ''; };
+            getById('upload-bg-btn').onclick = () => getById('bg-upload-input').click();
+            getById('remove-bg-btn').onclick = handleRemoveBackground;
+            getById('bg-upload-input').onchange = (e) => { if (e.target.files[0]) handleImageUpload(e.target.files[0]); e.target.value = ''; };
         }
+        
         document.addEventListener('DOMContentLoaded', () => {
-            setupEventListeners();
-            setupCardToggles();
+            setupEventListeners(); setupCardToggles();
             fetch('/api/background_status').then(res => res.json()).then(data => { if (data.status === 'custom') setBackgroundImage(data.url); });
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            setTheme(savedTheme);
+            const savedTheme = localStorage.getItem('theme') || 'light'; setTheme(savedTheme);
             const autoRefresh = localStorage.getItem('autoRefresh') === 'true';
-            document.getElementById('auto-refresh-toggle').checked = autoRefresh;
-            refreshData(true, true).then(() => { if (autoRefresh) startAutoRefresh(); });
+            getById('auto-refresh-toggle').checked = autoRefresh;
+            if(autoRefresh) getById('auto-refresh-toggle').dispatchEvent(new Event('change'));
+            refreshData(true, true);
         });
     </script>
 </body>
