@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# MosDNS 独立监控面板 - Beta版部署脚本
-# 版本：9.1 (Beta版专用)
+# MosDNS 独立监控面板 - Beta版专用部署脚本
+# 作者：ChatGPT & JimmyDADA & Phil Horse
+# 版本：9.2 (Beta独立部署版)
 # 特点：
-# - 专为 Beta 版 UI (带背景上传) 设计。
-# - 自动安装 werkzeug 依赖并创建 uploads 目录。
+# - [独立部署] 使用独立的目录、服务名和端口，与正式版完全隔离，互不干扰。
+# - 专为 Beta 版 UI (带背景上传) 设计，自动处理所有依赖和目录。
 
 # --- 定义颜色和样式 ---
 C_GREEN='\033[0;32m'; C_YELLOW='\033[0;33m'; C_RED='\033[0;31m'; C_BLUE='\033[0;34m'; C_CYAN='\033[0;36m'; C_PURPLE='\033[0;35m'; C_BOLD='\033[1m'; C_NC='\033[0m';
@@ -17,15 +18,17 @@ log_step() { echo -e "\n${C_PURPLE}🚀 [步骤 ${1}/${2}]${C_NC} ${C_BOLD}$3${C
 log_success() { echo -e "\n${C_GREEN}🎉🎉🎉 $1 🎉🎉🎉${C_NC}"; }
 print_line() { echo -e "${C_BLUE}==================================================================${C_NC}"; }
 
-# --- [BETA版配置] ---
+# --- [BETA版专用配置] ---
 FLASK_APP_NAME="mosdns_monitor_panel_beta"
 PROJECT_DIR="/opt/$FLASK_APP_NAME"
 BACKUP_DIR="$PROJECT_DIR/backups"
 UPLOAD_DIR="$PROJECT_DIR/uploads"
-FLASK_PORT=5002
+FLASK_PORT=5002 # Beta版使用 5002 端口
 SYSTEMD_SERVICE_FILE="/etc/systemd/system/$FLASK_APP_NAME.service"
-APP_PY_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/refs/heads/main/Beta/app.py"
-INDEX_HTML_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/refs/heads/main/Beta/index.html"
+
+# 使用您提供的 Beta 版文件下载地址
+APP_PY_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/main/Beta/app.py"
+INDEX_HTML_URL="https://raw.githubusercontent.com/Jimmyzxk/MosDNSUI/main/Beta/index.html"
 APP_PY_PATH="$PROJECT_DIR/app.py"
 INDEX_HTML_PATH="$PROJECT_DIR/templates/index.html"
 
@@ -33,7 +36,7 @@ INDEX_HTML_PATH="$PROJECT_DIR/templates/index.html"
 MOSDNS_ADMIN_URL="http://127.0.0.1:9099"
 WEB_USER="www-data"
 
-# --- 辅助命令执行函数 ---
+# --- 辅助命令执行函数 (重构版) ---
 run_command() {
     local message="$1"; shift
     printf "    %-55s" "$message"
@@ -58,7 +61,7 @@ deploy_beta() {
     run_command "更新 apt 缓存..." apt-get update -qq
     run_command "安装系统依赖..." apt-get install -y python3 python3-pip python3-flask python3-requests python3-werkzeug curl wget || return 1
     
-    log_step 2 5 "创建项目目录结构"
+    log_step 2 5 "创建 Beta 版项目目录结构"
     run_command "创建所有目录 (包括 uploads)..." mkdir -p "$PROJECT_DIR/templates" "$PROJECT_DIR/static" "$BACKUP_DIR" "$UPLOAD_DIR" || return 1
     
     log_step 3 5 "下载 Beta 版核心应用文件"
@@ -66,7 +69,7 @@ deploy_beta() {
     run_command "下载 index.html (Beta)..." wget -qO "$INDEX_HTML_PATH" "$INDEX_HTML_URL" || { log_error "下载 index.html 失败！"; return 1; }
     run_command "设置文件权限..." chown -R "$WEB_USER:$WEB_USER" "$PROJECT_DIR" || return 1
 
-    log_step 4 5 "创建并配置 Systemd 服务"
+    log_step 4 5 "创建并配置 Beta 版 Systemd 服务"
     local python_path; python_path=$(which python3)
     cat <<EOF > "$SYSTEMD_SERVICE_FILE"
 [Unit]
@@ -82,12 +85,12 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
-    run_command "创建 Systemd 服务文件..." true
+    run_command "创建 Systemd 服务文件 (${FLASK_APP_NAME}.service)..." true
 
     log_step 5 5 "启动服务并设置开机自启"
     run_command "重载 Systemd..." systemctl daemon-reload || return 1
-    run_command "启用服务..." systemctl enable "$FLASK_APP_NAME" || return 1
-    run_command "重启服务..." systemctl restart "$FLASK_APP_NAME" || { log_error "服务启动失败！请检查日志。"; return 1; }
+    run_command "启用 Beta 服务..." systemctl enable "$FLASK_APP_NAME" || return 1
+    run_command "重启 Beta 服务..." systemctl restart "$FLASK_APP_NAME" || { log_error "服务启动失败！请检查日志。"; return 1; }
     
     local ip_addr; ip_addr=$(hostname -I | awk '{print $1}')
     print_line; log_success "Beta 版部署完成！"
@@ -103,9 +106,9 @@ EOF
 
 uninstall_beta() {
     log_warn "正在卸载 Beta 版..."
-    run_command "停止并禁用服务" systemctl stop "$FLASK_APP_NAME" && systemctl disable "$FLASK_APP_NAME"
-    run_command "移除服务文件" rm -f "$SYSTEMD_SERVICE_FILE" && systemctl daemon-reload
-    run_command "移除项目目录" rm -rf "$PROJECT_DIR"
+    run_command "停止并禁用 Beta 服务" systemctl stop "$FLASK_APP_NAME" && systemctl disable "$FLASK_APP_NAME"
+    run_command "移除 Beta 服务文件" rm -f "$SYSTEMD_SERVICE_FILE" && systemctl daemon-reload
+    run_command "移除 Beta 项目目录" rm -rf "$PROJECT_DIR"
     log_success "Beta 版卸载完成！"
 }
 
