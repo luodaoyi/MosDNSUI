@@ -16,15 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, windows, darwin] # 需要打包的系统
+        # [linux, windows, darwin]
+        goos: [linux, windows] # 需要打包的系统
         goarch: ["386", amd64, arm64, arm] # 需要打包的架构
         exclude: # 排除某些不支持的平台组合
-          - goarch: "386"
-            goos: darwin
-          - goarch: s390x
-            goos: darwin
-          - goarch: arm
-            goos: darwin
           - goarch: arm64
             goos: windows
 
