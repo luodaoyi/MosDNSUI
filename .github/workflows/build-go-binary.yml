@@ -1,0 +1,53 @@
+name: Build Go Binary
+
+on:
+  release:
+    types: [created] # 在创建新的 Release 时触发
+  push:
+    tags:
+      - 'v*' # 推送 tag 时也触发
+  workflow_dispatch: # 允许手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  build-go-binary:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin] # 需要打包的系统
+        goarch: ["386", amd64, arm64, arm] # 需要打包的架构
+        exclude: # 排除某些不支持的平台组合
+          - goarch: "386"
+            goos: darwin
+          - goarch: s390x
+            goos: darwin
+          - goarch: arm64
+            goos: windows
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Build binary
+        uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: '1.25'
+          project_path: .
+          binary_name: mosdns-ui
+          asset_name: mosdns-ui-${{ matrix.goos }}-${{ matrix.goarch }}
+          build_flags: -v
+          ldflags: -s -w -X main.version=${{ github.ref_name }}
+          extra_files: README.md
